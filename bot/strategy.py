@@ -67,7 +67,7 @@ class Strategy:
                         time.sleep(1)
                         new_equity = self.broker.get_balance()
                         cost = qty * price
-                        log_trade(balance_before, new_equity, cost, symbol, (cost/balance_before)*100, "BUY")
+                        log_trade(balance_before, new_equity, cost, symbol, (cost/balance_before)*100, "BUY", quantity=qty)
                         print(f"Bought {qty} of {symbol}")
 
             elif signal == "SELL":
@@ -85,7 +85,7 @@ class Strategy:
         time.sleep(1)
         balance_after = self.broker.get_balance()
 
-        log_trade(balance_before, balance_after, current_price * float(qty), symbol, 0, "SELL", profit=profit)
+        log_trade(balance_before, balance_after, current_price * float(qty), symbol, 0, "SELL", quantity=float(qty), profit=profit)
         print(f"Sold {symbol}. Profit: {profit}. Total profit: {self.total_profit}")
 
     def buy_dividend_stock(self):
@@ -98,9 +98,6 @@ class Strategy:
             qty = self.risk_mgmt.calculate_position_size(current_equity, price)
             cost = qty * price
 
-            # REQUIREMENT: Ensure there's "extra money" left to keep buying other stocks.
-            # We don't want to use more than 20% of current equity for a dividend stock buy,
-            # and we want to ensure buying power stays above 50% of equity for other trades.
             remaining_equity = current_equity - cost
             if remaining_equity < (current_equity * 0.5):
                 print(f"Skipping dividend buy for {symbol}: insufficient extra money to maintain portfolio diversity.")
@@ -114,7 +111,7 @@ class Strategy:
 
                 time.sleep(1)
                 new_equity = self.broker.get_balance()
-                log_trade(balance_before, new_equity, cost, symbol, (cost/balance_before)*100, "BUY", profit=-reinvest_cost)
+                log_trade(balance_before, new_equity, cost, symbol, (cost/balance_before)*100, "BUY", quantity=qty, profit=-reinvest_cost)
                 self.owned_dividend_stocks[symbol] = {"entry_price": price, "qty": qty}
                 print(f"Profit reinvested: Bought dividend stock {symbol}")
 
@@ -133,6 +130,6 @@ class Strategy:
             time.sleep(1)
             balance_after = self.broker.get_balance()
 
-            log_trade(balance_before, balance_after, current_price * float(data["qty"]), symbol, 0, "SELL", profit=profit)
+            log_trade(balance_before, balance_after, current_price * float(data["qty"]), symbol, 0, "SELL", quantity=float(data["qty"]), profit=profit)
             del self.owned_dividend_stocks[symbol]
             print(f"Target reached! Sold dividend stock {symbol} for 50%+ profit.")

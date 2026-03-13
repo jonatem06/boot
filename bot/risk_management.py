@@ -17,7 +17,10 @@ class RiskManagement:
 
         if Config.ALLOW_FRACTIONAL_SHARES:
             qty = max_alloc / stock_price
-            return round(qty, 4) # Alpaca supports up to 9, but 4 is usually plenty
+            qty = round(qty, 4)
+            if qty < 0.01:
+                return 0
+            return qty
         else:
             qty = max_alloc // stock_price
             return int(qty)
