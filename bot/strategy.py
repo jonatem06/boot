@@ -47,7 +47,7 @@ class Strategy:
                 continue
 
             signal, price = self.analysis.generate_signal(symbol)
-            if price <= 0: continue # Safety
+            if price <= 0: continue
 
             position = self.broker.get_position_for_symbol(symbol)
 
@@ -96,6 +96,16 @@ class Strategy:
 
         if price > 0:
             qty = self.risk_mgmt.calculate_position_size(current_equity, price)
+            cost = qty * price
+
+            # REQUIREMENT: Ensure there's "extra money" left to keep buying other stocks.
+            # We don't want to use more than 20% of current equity for a dividend stock buy,
+            # and we want to ensure buying power stays above 50% of equity for other trades.
+            remaining_equity = current_equity - cost
+            if remaining_equity < (current_equity * 0.5):
+                print(f"Skipping dividend buy for {symbol}: insufficient extra money to maintain portfolio diversity.")
+                return
+
             if qty > 0:
                 balance_before = current_equity
                 self.execution.buy_market(symbol, qty)
@@ -104,7 +114,6 @@ class Strategy:
 
                 time.sleep(1)
                 new_equity = self.broker.get_balance()
-                cost = qty * price
                 log_trade(balance_before, new_equity, cost, symbol, (cost/balance_before)*100, "BUY", profit=-reinvest_cost)
                 self.owned_dividend_stocks[symbol] = {"entry_price": price, "qty": qty}
                 print(f"Profit reinvested: Bought dividend stock {symbol}")
