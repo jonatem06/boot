@@ -14,7 +14,7 @@ Este es un bot de trading automatizado escrito en Python que utiliza la API de A
 3.  **Módulo de Gestión de Riesgo (Equity Guardian)**:
     *   **Control de Drawdown**: Detiene las operaciones si la caída de la cuenta supera un porcentaje definido.
     *   **Stop-Loss Automático**: Protege cada posición contra pérdidas excesivas.
-    *   **Dimensionamiento de Posiciones**: Limita la inversión por acción (máximo 10%) para mantener la diversidad de la cartera.
+    *   **Dimensionamiento de Posiciones**: Limita la inversión por acción (máximo 10%) para mantener la diversidad de la cartera. Soporta la compra de **acciones fraccionadas**.
 4.  **Estrategia de Dividendos**:
     *   Cuando el bot acumula un beneficio neto específico ($1000), compra automáticamente una acción de dividendos.
     *   **Mantenimiento de Liquidez**: Solo compra acciones de dividendos si queda suficiente capital (50% de equity) para seguir operando con otras acciones.
@@ -76,5 +76,6 @@ python3 -m unittest discover tests
 Puedes ajustar los parámetros de riesgo y estrategia en `bot/config.py`:
 *   `MAX_POSITION_PERCENT`: Porcentaje máximo de la cartera por acción.
 *   `MAX_DRAWDOWN_PERCENT`: Caída máxima permitida antes de detener el bot.
+*   `ALLOW_FRACTIONAL_SHARES`: Permite comprar fracciones de acciones (ej. 0.5 acciones).
 *   `DIVIDEND_REINVEST_THRESHOLD`: Beneficio necesario para comprar una acción de dividendos.
 *   `DIVIDEND_HOLD_PROFIT_TARGET`: Objetivo de ganancia (1.5 = 50%) para vender acciones de dividendos.
