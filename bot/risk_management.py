@@ -14,8 +14,13 @@ class RiskManagement:
     def calculate_position_size(self, current_equity, stock_price):
         # Limit per position based on Config
         max_alloc = current_equity * Config.MAX_POSITION_PERCENT
-        qty = max_alloc // stock_price
-        return int(qty)
+
+        if Config.ALLOW_FRACTIONAL_SHARES:
+            qty = max_alloc / stock_price
+            return round(qty, 4) # Alpaca supports up to 9, but 4 is usually plenty
+        else:
+            qty = max_alloc // stock_price
+            return int(qty)
 
     def should_stop_loss(self, entry_price, current_price, stop_loss_pct=0.05):
         if (entry_price - current_price) / entry_price >= stop_loss_pct:
