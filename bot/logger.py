@@ -15,22 +15,26 @@ class Trade(Base):
     cost = Column(Float)
     symbol = Column(String)
     percentage = Column(Float)
+    side = Column(String) # 'BUY' or 'SELL'
+    profit = Column(Float, default=0.0) # Added profit column
 
 # Setup database
 engine = create_engine('sqlite:///trades.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
-def log_trade(balance_before, balance_after, cost, symbol, percentage):
+def log_trade(balance_before, balance_after, cost, symbol, percentage, side, profit=0.0):
     session = Session()
     new_trade = Trade(
         balance_before=balance_before,
         balance_after=balance_after,
         cost=cost,
         symbol=symbol,
-        percentage=percentage
+        percentage=percentage,
+        side=side,
+        profit=profit
     )
     session.add(new_trade)
     session.commit()
     session.close()
-    print(f"Logged trade for {symbol} at cost {cost}")
+    print(f"Logged {side} for {symbol} at cost {cost}. Profit: {profit}")
